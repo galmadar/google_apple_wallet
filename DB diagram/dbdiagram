@@ -1,0 +1,91 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+// Common
+
+Table companies {
+  id integer [pk]
+  name text
+}
+
+// Google
+
+Table google_wallet_business {
+  issuer_id text [pk]
+  company_id integer [pk]
+  service_account_key_path text
+  name text
+}
+
+Table google_pass_class {
+  id integer [pk]
+  issuer_id integer
+  name text
+  template json
+}
+
+Table google_pass_object {
+  id integer [pk]
+  google_pass_class_id integer
+  params json
+}
+
+Table google_end_users {
+  user_id integer [pk]
+  pass_object integer
+  user_details json
+}
+
+Ref: "companies"."id" < "google_wallet_business"."company_id"
+
+Ref: "google_wallet_business"."issuer_id" < "google_pass_class"."issuer_id"
+
+Ref: "google_pass_class"."id" < "google_pass_object"."google_pass_class_id"
+
+Ref: "google_pass_object"."id" < "google_end_users"."pass_object"
+
+// Apple
+
+Table apple_dev_account {
+  id integer [pk]
+  company_id integer
+  team_identifier text
+}
+
+Table apple_pass_type_source_group {
+  id integer [pk]
+  group_id integer
+}
+
+Table apple_pass_type_source {
+  id integer [pk]
+  apple_dev_account_id integer
+  apple_group_blablablbal integer
+  pass_type_identifier text
+  path_to_source_directory text
+  path_to_certificate text
+  certificate_expiration_date date
+}
+
+Table apple_wallet_pass {
+  id integer [pk]
+  pass_type_identifier text
+  pass_serial_number text
+}
+
+Table apple_end_users {
+  id integer [pk]
+  apple_wallet_pass_id integer
+  user_details json
+}
+
+Ref: "companies"."id" < "apple_dev_account"."company_id"
+
+Ref: "apple_dev_account"."id" < "apple_pass_type_source"."apple_dev_account_id"
+
+Ref: "apple_pass_type_source"."pass_type_identifier" < "apple_wallet_pass"."pass_type_identifier"
+
+Ref: "apple_wallet_pass"."id" < "apple_end_users"."apple_wallet_pass_id"
+
+
+Ref: "apple_pass_type_source"."apple_group_blablablbal" < "apple_pass_type_source_group"."group_id"
